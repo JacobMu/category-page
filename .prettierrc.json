@@ -1,0 +1,11 @@
+{
+	"pluginSearchDirs": ["."],
+	"plugins": ["prettier-plugin-tailwindcss"],
+	"overrides": [],
+	"printWidth": 100,
+	"tabWidth": 4,
+	"useTabs": true,
+	"semi": true,
+	"jsxSingleQuote": false,
+	"singleQuote": false
+}
