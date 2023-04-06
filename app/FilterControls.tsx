@@ -4,16 +4,24 @@ import type { FilterItem } from "@app/api-service/TypesService";
 import type { ChangeEvent, FormEvent } from "react";
 import { Selection } from "@app/components/filtering/Selection";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import {
+	getFilterUrlSearchParams,
+	getInitialFilterSearchParams,
+	getUpdatedFilterState,
+} from "@app/FilterControlsService";
 
 interface Props {
 	filters: FilterItem[];
-	onSubmitFilter: (formSearchParam: string) => void;
 }
 
-export const FilterControls = ({ filters, onSubmitFilter }: Props) => {
-	const filterParam = new URL(window.location.href).searchParams.get("filters") ?? "{}";
+export const FilterControls = ({ filters }: Props) => {
+	const router = useRouter();
+
 	const [isExpanded, setIsExpanded] = useState(false);
-	const [filter, setFilter] = useState<Record<string, string>>(JSON.parse(filterParam));
+	const [filterState, setFilterState] = useState<Record<string, string>>(
+		getInitialFilterSearchParams()
+	);
 
 	const handleClick = () => {
 		setIsExpanded((prevState) => !prevState);
@@ -21,30 +29,21 @@ export const FilterControls = ({ filters, onSubmitFilter }: Props) => {
 
 	const handleChange = (filterCode: string) => (event: ChangeEvent<HTMLSelectElement>) => {
 		const { value: filterId } = event.target;
-		const filterState = structuredClone(filter);
 
-		if (filterId === "---") {
-			delete filterState[filterCode];
-			setFilter(filterState);
-			return;
-		}
-
-		filterState[filterCode] = filterId;
-		setFilter(filterState);
+		setFilterState(
+			getUpdatedFilterState({
+				filterState: structuredClone(filterState),
+				filterId,
+				filterCode,
+			})
+		);
 	};
 
 	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
 		event.preventDefault();
 
-		const url = new URL(window.location.href);
-		url.searchParams.set("filters", JSON.stringify(filter));
-		window.location.assign(url);
-
-		const filterSearchParams = new URLSearchParams();
-		Object.entries(filter).forEach(([filterCode, filterId]) => {
-			filterSearchParams.append(`${filterCode}[]`, filterId);
-		});
-		onSubmitFilter(filterSearchParams.toString());
+		router.push(`/?${getFilterUrlSearchParams(filterState)}`);
+		setIsExpanded(false);
 	};
 
 	return (
@@ -62,7 +61,7 @@ export const FilterControls = ({ filters, onSubmitFilter }: Props) => {
 					<div className="grid grid-cols-1 gap-2 px-8 pb-8 md:grid-cols-2 lg:grid-cols-3">
 						{filters.map(({ name, code, options }, index) => (
 							<Selection
-								selectedValue={filter[code]}
+								selectedValue={filterState?.[code]}
 								onChange={handleChange(code)}
 								key={index}
 								selectionName={name}

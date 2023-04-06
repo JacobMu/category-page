@@ -8,20 +8,22 @@ const OPTIONS = {
 	},
 };
 
-export async function getProductsData(): Promise<CategoryPageData> {
-	const response = await fetch(`${URL_BASE}/catalog/products?category_ids[]=2416`, OPTIONS).catch(
-		(err: Error) => {
-			throw err;
-		}
-	);
-	return (await response.json()) as Promise<CategoryPageData>;
+function getProductsUrl(): string {
+	return `${URL_BASE}/catalog/products?category_ids[]=2416`;
 }
 
-export async function getFilteredProductsData(searchParam: string): Promise<CategoryPageData> {
-	const response = await fetch(
-		`${URL_BASE}/catalog/products?category_ids[]=2416&${searchParam}`,
-		OPTIONS
-	).catch((err: Error) => {
+export async function getProductsData(searchParams?: {
+	[key: string]: string;
+}): Promise<CategoryPageData> {
+	let url = getProductsUrl();
+
+	if (searchParams) {
+		Object.entries(searchParams).forEach(([filterCode, filterId]) => {
+			url = `${url}&${filterCode}=${filterId}`;
+		});
+	}
+
+	const response = await fetch(url, OPTIONS).catch((err: Error) => {
 		throw err;
 	});
 	return (await response.json()) as Promise<CategoryPageData>;
