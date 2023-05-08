@@ -24,7 +24,8 @@ export async function getProductsData(searchParams?: {
 	}
 
 	const response = await fetch(url, OPTIONS).catch((err: Error) => {
-		throw err;
+		console.error(err);
 	});
-	return (await response.json()) as Promise<CategoryPageData>;
+
+	return (await response?.json()) as Promise<CategoryPageData>;
 }

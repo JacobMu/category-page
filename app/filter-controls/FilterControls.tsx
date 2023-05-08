@@ -9,43 +9,16 @@ import {
 	getFilterUrlSearchParams,
 	getInitialFilterSearchParams,
 	getUpdatedFilterState,
-} from "@app/FilterControlsService";
+} from "@app/filter-controls/FilterControlsService";
+import { useFilterControls } from "@app/filter-controls/useFilterControls";
 
 interface Props {
 	filters: FilterItem[];
 }
 
 export const FilterControls = ({ filters }: Props) => {
-	const router = useRouter();
-
-	const [isExpanded, setIsExpanded] = useState(false);
-	const [filterState, setFilterState] = useState<Record<string, string>>(
-		getInitialFilterSearchParams()
-	);
-
-	const handleClick = () => {
-		setIsExpanded((prevState) => !prevState);
-	};
-
-	const handleChange = (filterCode: string) => (event: ChangeEvent<HTMLSelectElement>) => {
-		const { value: filterId } = event.target;
-
-		setFilterState(
-			getUpdatedFilterState({
-				filterState: structuredClone(filterState),
-				filterId,
-				filterCode,
-			})
-		);
-	};
-
-	const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
-		event.preventDefault();
-
-		router.push(`/?${getFilterUrlSearchParams(filterState)}`);
-		setIsExpanded(false);
-	};
-
+	const { handleSubmit, handleClick, handleChange, isExpanded, filterState } =
+		useFilterControls();
 	return (
 		<div className="absolute top-0 z-30 w-full bg-white p-6">
 			<button

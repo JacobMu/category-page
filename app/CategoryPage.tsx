@@ -1,7 +1,7 @@
 "use client";
 
 import type { CategoryPageData } from "@app/api-service/TypesService";
-import { FilterControls } from "@app/FilterControls";
+import { FilterControls } from "@app/filter-controls/FilterControls";
 import { ProductItems } from "@app/ProductItems";
 
 interface Props {
